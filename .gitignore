@@ -1,0 +1,5 @@
+node_modules/
+/src/config/development.js
+filesGenerated/*
+package-lock.json
+/src/generator*

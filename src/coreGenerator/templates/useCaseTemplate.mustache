@@ -1,0 +1,22 @@
+import { logPromise, logError, startPromise } from '../../utils/logUtils.js';
+import { generateFile } from '../../core/useCase/generatorUseCase';
+import {
+    {{#filesToGenerate}}
+    getDirectory{{filePascalName}}Definitions, 
+    {{/filesToGenerate}}
+} from '../service/{{camelName}}Service';
+
+{{#filesToGenerate}}
+const create{{filePascalName}} = (data) =>
+    startPromise(data)
+        .then(getDirectory{{filePascalName}}Definitions)
+        .then(generateFile(data, '{{filePascalName}} completed'))
+        .catch(logError('error in {{filePascalName}}'));
+
+{{/filesToGenerate}}
+
+export {
+    {{#filesToGenerate}}
+    create{{filePascalName}}, 
+    {{/filesToGenerate}}
+};

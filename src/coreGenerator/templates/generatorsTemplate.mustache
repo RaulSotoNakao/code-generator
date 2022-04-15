@@ -1,0 +1,20 @@
+import { startGenerator, questionsToMake, transformData, create } from '../../core/useCase/generatorUseCase';
+import { promptInputQuestion } from '../../core/service/promptQuestionsService';
+import { prepareDefaultNameData } from '../../core/service/prepareDataService';
+import {
+    {{#filesToGenerate}}
+    create{{filePascalName}},
+    {{/filesToGenerate}}
+} from '../useCase/{{camelName}}UseCase';
+
+startGenerator(
+    questionsToMake(
+        () => promptInputQuestion('baseName', 'write base_name data to use in templates :)'),
+    ),
+    transformData((answers) => prepareDefaultNameData(answers)),
+    create(
+        {{#filesToGenerate}}
+        (preparedData) => create{{filePascalName}}(preparedData),
+        {{/filesToGenerate}}
+    ),
+);

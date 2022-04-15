@@ -1,0 +1,17 @@
+
+{{#filesToGenerate}}
+const getDirectory{{filePascalName}}Definitions = ({ camelName = 'CAMEL_NAME_NOT_DEFINED' }) => {
+    return {
+        templateNameDir: 'generator{{pascalName}}/templates/{{fileCamelName}}.mustache',
+        dirToWrite: `./generatedFiles/${camelName}.js`,
+    };
+};
+
+{{/filesToGenerate}}
+
+
+export {
+    {{#filesToGenerate}}
+    getDirectory{{filePascalName}}Definitions, 
+    {{/filesToGenerate}}
+};
