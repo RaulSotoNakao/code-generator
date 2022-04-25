@@ -9,7 +9,7 @@ import {
 
 startGenerator(
     questionsToMake(
-        () => promptInputQuestion('baseName', 'write base_name data to use in templates :)'),
+        () => promptInputQuestion('baseName', 'write base_name data to use in templates :)')(),
     ),
     transformData((answers) => prepareDefaultNameData(answers)),
     create(

@@ -1,5 +1,6 @@
 node_modules/
 /src/config/development.js
-filesGenerated/*
+!generatedFiles/.gitkeep
+generatedFiles/**
 package-lock.json
 /src/generator*

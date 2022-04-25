@@ -7,7 +7,7 @@ import {
     logPromise,
     deleteFirstOfList,
 } from '../../core/utils/utils';
-import { createDir } from '../../core/service/fileSystemService';
+import { createDirInSrc } from '../../core/service/fileSystemService';
 import { generateFile } from '../../core/useCase/generatorUseCase';
 import {
     getTemplateDefinitions,
@@ -23,11 +23,11 @@ import { promptInputQuestion } from '../../core/service/promptQuestionsService';
 const createBaseDirectoryEstructure = ({ baseDirName }) =>
     startPromise(baseDirName)
         .then(() => logPromise('baseDirName'))
-        .then(() => createDir(baseDirName))
-        .then(() => createDir(`${baseDirName}/generators`))
-        .then(() => createDir(`${baseDirName}/service`))
-        .then(() => createDir(`${baseDirName}/templates`))
-        .then(() => createDir(`${baseDirName}/useCase`));
+        .then(() => createDirInSrc(baseDirName))
+        .then(() => createDirInSrc(`${baseDirName}/generators`))
+        .then(() => createDirInSrc(`${baseDirName}/service`))
+        .then(() => createDirInSrc(`${baseDirName}/templates`))
+        .then(() => createDirInSrc(`${baseDirName}/useCase`));
 
 const createFilesInBaseDirectory = (answers) =>
     startPromise()

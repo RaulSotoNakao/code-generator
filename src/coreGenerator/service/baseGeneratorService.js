@@ -26,7 +26,7 @@ const getServiceDefinitions = ({ baseDirName, camelName }) => {
 const getTemplateDefinitions = ({ baseDirName, fileCamelName }) => {
     return {
         templateNameDir: 'coreGenerator/templates/templatesTemplate.mustache',
-        dirToWrite: `./src/${baseDirName}/templates/${fileCamelName}Template.js`,
+        dirToWrite: `./src/${baseDirName}/templates/${fileCamelName}Template.mustache`,
     };
 };
 
