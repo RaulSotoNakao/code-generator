@@ -4,8 +4,7 @@
     "description": "This is a future library that generate code using templates, modularity structure and a declarative paradigm!",
     "main": "index.js",
     "scripts": {
-        "core-baseEstructure": "babel-node ./src/coreGenerator/generators/baseGeneratorEstructure.js",
-        "nest-server": "babel-node ./src/generatorNestServer/generators/nestServer.js"
+        "start": "babel-node ./src/index.js"
     },
     "author": "Raulito",
     "license": "MIT",

@@ -11,18 +11,19 @@ import {
     createDirectoryEstructure
 } from '../useCase/nestServerUseCase';
 
-startGenerator(
-    questionsToMake(
-        () => promptInputQuestion('baseName', 'write base_name data to use in templates :)')(),
-    ),
-    transformData((answers) => prepareDefaultNameData(answers)),
-    create(
-        (preparedData) => createDirectoryEstructure(preparedData),
-        (preparedData) => createController(preparedData),
-        (preparedData) => createService(preparedData),
-        (preparedData) => createModule(preparedData),
-        (preparedData) => createEntity(preparedData),
-        (preparedData) => createCreatedDto(preparedData),
-        (preparedData) => createUpdatedDto(preparedData),
-    ),
-);
+export default
+    startGenerator(
+        questionsToMake(
+            () => promptInputQuestion('baseName', 'write base_name data to use in templates :)')(),
+        ),
+        transformData((answers) => prepareDefaultNameData(answers)),
+        create(
+            (preparedData) => createDirectoryEstructure(preparedData),
+            (preparedData) => createController(preparedData),
+            (preparedData) => createService(preparedData),
+            (preparedData) => createModule(preparedData),
+            (preparedData) => createEntity(preparedData),
+            (preparedData) => createCreatedDto(preparedData),
+            (preparedData) => createUpdatedDto(preparedData),
+        ),
+    )

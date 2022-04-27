@@ -10,7 +10,7 @@ const generateFile =
             .then((renderedTemplate) => writeTemplate(dirToWrite, renderedTemplate))
             .then(logPromise(`${log}`));
 
-const startGenerator = (questionsToMakeWrapper, transformDataWrapper, createWrapper) => {
+const startGenerator = (questionsToMakeWrapper, transformDataWrapper, createWrapper) => () => {
     return startPromise()
         .then(questionsToMakeWrapper)
         .then(transformDataWrapper)

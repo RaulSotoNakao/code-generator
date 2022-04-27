@@ -7,17 +7,18 @@ import {
     numberAndNameOfFilesToCreateQuestion,
 } from '../useCase/baseGeneratorUseCase';
 
-startGenerator(
-    questionsToMake(
-        () => promptInputQuestion('baseName', 'Write baseName generate files')(),
-        () => numberAndNameOfFilesToCreateQuestion(),
-    ),
-    transformData(
-        (answers) => prepareGeneralNameData(answers),
-        (answers) => preparefilesNamesData(answers),
-    ),
-    create(
-        (preparedData) => createBaseDirectoryEstructure(preparedData),
-        (preparedData) => createFilesInBaseDirectory(preparedData),
-    ),
-);
+export default
+    startGenerator(
+        questionsToMake(
+            () => promptInputQuestion('baseName', 'Write baseName generate files')(),
+            () => numberAndNameOfFilesToCreateQuestion(),
+        ),
+        transformData(
+            (answers) => prepareGeneralNameData(answers),
+            (answers) => preparefilesNamesData(answers),
+        ),
+        create(
+            (preparedData) => createBaseDirectoryEstructure(preparedData),
+            (preparedData) => createFilesInBaseDirectory(preparedData),
+        ),
+    );
