@@ -15,10 +15,13 @@ import {
     getServiceDefinitions,
     getGeneratorsDefinitions,
     fillListWithQuestion,
+    addExportDefault,
+    addImportStatement
 } from '../service/baseGeneratorService';
 import { isValidNumberOrExecute } from '../../core/service/validationService';
 
 import { promptInputQuestion } from '../../core/service/promptQuestionsService';
+import { readFile, writeFile } from '../../core/utils/utils'
 
 const createBaseDirectoryEstructure = ({ baseDirName }) =>
     startPromise(baseDirName)
@@ -37,17 +40,18 @@ const createFilesInBaseDirectory = (answers) =>
         .then(generateFile(answers, 'Service File completed'))
         .then(() => createTemplate(answers, answers.filesToGenerate))
         .then(() => getUseCaseDefinitions(answers))
-        .then(generateFile(answers, 'UseCase File completed'));
+        .then(generateFile(answers, 'UseCase File completed'))
+        .then(() => updateGeneratorDefinitions(answers));
 
 const createTemplate = (answers, filesToGenerate) =>
     filesToGenerate.length
         ? startPromise()
-              .then(() => filesToGenerate[0])
-              .then((selectedFile) => ({ ...answers, ...selectedFile }))
-              .then(getTemplateDefinitions)
-              .then(generateFile(answers, `${filesToGenerate[0].filePascalName} Template completed`))
-              .then(() => createTemplate(answers, deleteFirstOfList(filesToGenerate)))
-              .catch(logError(`error in ${filesToGenerate[0].filePascalName} createTemplate`))
+            .then(() => filesToGenerate[0])
+            .then((selectedFile) => ({ ...answers, ...selectedFile }))
+            .then(getTemplateDefinitions)
+            .then(generateFile(answers, `${filesToGenerate[0].filePascalName} Template completed`))
+            .then(() => createTemplate(answers, deleteFirstOfList(filesToGenerate)))
+            .catch(logError(`error in ${filesToGenerate[0].filePascalName} createTemplate`))
         : Promise.resolve();
 
 const numberAndNameOfFilesToCreateQuestion = () =>
@@ -68,4 +72,14 @@ const numberOfFilesToCreateQuestion = () =>
         .then(() => promptInputQuestion('number', 'Write number of files to create')())
         .then(({ number }) => isValidNumberOrExecute(number, numberOfFilesToCreateQuestion));
 
-export { createBaseDirectoryEstructure, createFilesInBaseDirectory, numberAndNameOfFilesToCreateQuestion };
+const updateGeneratorDefinitions = (preparedData) =>
+    startPromise()
+        .then(() => readFile('./src/generatorDefinitions.js'))
+        .then((fileData) => fileData.toString().split("\n"))
+        .then((fileLinesList) => addImportStatement(fileLinesList, preparedData))
+        .then((fileLinesList) => addExportDefault(fileLinesList, preparedData))
+        .then((fileLinesList) => fileLinesList.join('\n'))
+        .then((fileDataUpdated) => writeFile('./src/generatorDefinitions.js', fileDataUpdated))
+
+
+export { createBaseDirectoryEstructure, createFilesInBaseDirectory, numberAndNameOfFilesToCreateQuestion, updateGeneratorDefinitions };

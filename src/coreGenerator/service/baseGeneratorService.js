@@ -50,6 +50,23 @@ const fillListWithQuestion = (list, questionToAdd) => {
     return list.map((a, index) => questionToAdd(index + 1));
 };
 
+const addExportDefault = (fileLinesList, preparedData) => {
+    const lineWithExportDefault = fileLinesList.findIndex(line => line.includes('export default {'))
+    const part1 = fileLinesList.slice(0, lineWithExportDefault + 1);
+    const part2 = fileLinesList.slice(lineWithExportDefault + 1, fileLinesList.length + 1);
+    const exportStatement = `    ${preparedData.camelName},\r`
+    return [
+        ...part1, exportStatement, ...part2
+    ]
+}
+const addImportStatement = (fileLinesList, preparedData) => {
+    const importStatement = `import ${preparedData.camelName} from "./generator${preparedData.pascalName}/generators/${preparedData.camelName}";\r`
+    return [
+        importStatement, ...fileLinesList
+    ]
+
+}
+
 export {
     fillListWithQuestion,
     getTemplateDefinitions,
@@ -58,4 +75,6 @@ export {
     getGeneratorsDefinitions,
     prepareGeneralNameData,
     preparefilesNamesData,
+    addExportDefault,
+    addImportStatement
 };
