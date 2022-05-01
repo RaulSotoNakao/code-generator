@@ -3,3 +3,5 @@ node_modules/
 !generatedFiles/.gitkeep
 generatedFiles/**
 package-lock.json
+/src/.generator*
+/src/.index.js

@@ -4,7 +4,8 @@
     "description": "This is a future library that generate code using templates, modularity structure and a declarative paradigm!",
     "main": "index.js",
     "scripts": {
-        "start": "babel-node ./src/index.js"
+        "start": "babel-node ./src/index.js",
+        "start:hide": "babel-node ./src/.index.js"
     },
     "author": "Raulito",
     "license": "MIT",

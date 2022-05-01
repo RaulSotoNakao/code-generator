@@ -1,12 +1,12 @@
 import { pascalCase, camelCase } from 'change-case';
 import { prepareDefaultNameData } from '../../core/service/prepareDataService';
 import { logRed } from '../../core/service/logService';
-import generatorDefinitions from "../../generatorDefinitions"
+import generatorDefinitions from '../../generatorDefinitions';
 
-const prepareGeneralNameData = ({ baseName, baseDirName }) => {
+const prepareGeneralNameData = ({ baseName, baseDirName, hide }) => {
     return {
         ...prepareDefaultNameData({ baseName }),
-        baseDirName: `generator${pascalCase(baseDirName)}`,
+        baseDirName: `${hide ? '.' : ''}generator${pascalCase(baseDirName)}`,
     };
 };
 
@@ -43,33 +43,41 @@ const getDefinitions = () => {
         templateNameDir: 'coreGenerator/templates/generatorDefinitionTemplate.mustache',
         dirToWrite: `./src/generatorDefinitions.js`,
     };
-}
+};
 
 const prepareGeneratorDefinitions = (answers) => {
-    const generatorsDefinition = generatorDefinitions.map(def => {
-        const generators = def.generators.map(d => ({ generatorName: d }))
+    const generatorsDefinition = generatorDefinitions.map((def) => {
+        const generators = def.generators.map((d) => ({ generatorName: d }));
         const defParsed = {
             baseDirName: def.baseDirName,
-            generators
-        }
-        return defParsed
-    })
-    return { generatorsDefinition: [...generatorsDefinition, { baseDirName: answers.baseDirName, generators: [{ generatorName: answers.camelName }] }] }
-}
+            generators,
+        };
+        return defParsed;
+    });
+    return {
+        generatorsDefinition: [
+            ...generatorsDefinition,
+            { baseDirName: answers.baseDirName, generators: [{ generatorName: answers.camelName }] },
+        ],
+    };
+};
 
 const prepareGeneratorDefinitionsToAdd = (preparedData) => {
-    const generatorsDefinition = generatorDefinitions.map(def => {
-        const generators = def.generators.map(d => ({ generatorName: d }));
-        const generatorsNameToAdd = preparedData.baseDirName === def.baseDirName ? [...generators, { generatorName: preparedData.camelName }] : generators
+    const generatorsDefinition = generatorDefinitions.map((def) => {
+        const generators = def.generators.map((d) => ({ generatorName: d }));
+        const generatorsNameToAdd =
+            preparedData.baseDirName === def.baseDirName
+                ? [...generators, { generatorName: preparedData.camelName }]
+                : generators;
 
         const defParsed = {
             baseDirName: def.baseDirName,
-            generators: generatorsNameToAdd
-        }
-        return defParsed
-    })
-    return { generatorsDefinition: [...generatorsDefinition] }
-}
+            generators: generatorsNameToAdd,
+        };
+        return defParsed;
+    });
+    return { generatorsDefinition: [...generatorsDefinition] };
+};
 
 const preparefilesNamesData = ({ filesNames = [] }) => {
     return {
@@ -85,21 +93,16 @@ const fillListWithQuestion = (list, questionToAdd) => {
 };
 
 const addExportDefault = (fileLinesList, preparedData) => {
-    const lineWithExportDefault = fileLinesList.findIndex(line => line.includes('export default {'))
+    const lineWithExportDefault = fileLinesList.findIndex((line) => line.includes('export default {'));
     const part1 = fileLinesList.slice(0, lineWithExportDefault + 1);
     const part2 = fileLinesList.slice(lineWithExportDefault + 1, fileLinesList.length + 1);
-    const exportStatement = `    ${preparedData.camelName},\r`
-    return [
-        ...part1, exportStatement, ...part2
-    ]
-}
+    const exportStatement = `    ${preparedData.camelName},\r`;
+    return [...part1, exportStatement, ...part2];
+};
 const addImportStatement = (fileLinesList, preparedData) => {
-    const importStatement = `import ${preparedData.camelName} from "./${preparedData.baseDirName}/generators/${preparedData.camelName}";\r`
-    return [
-        importStatement, ...fileLinesList
-    ]
-
-}
+    const importStatement = `import ${preparedData.camelName} from "./${preparedData.baseDirName}/generators/${preparedData.camelName}";\r`;
+    return [importStatement, ...fileLinesList];
+};
 
 export {
     fillListWithQuestion,
@@ -113,5 +116,5 @@ export {
     addImportStatement,
     getDefinitions,
     prepareGeneratorDefinitions,
-    prepareGeneratorDefinitionsToAdd
+    prepareGeneratorDefinitionsToAdd,
 };

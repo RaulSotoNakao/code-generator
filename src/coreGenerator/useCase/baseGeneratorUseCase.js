@@ -17,12 +17,12 @@ import {
     fillListWithQuestion,
     addExportDefault,
     addImportStatement,
-    getDefinitions
+    getDefinitions,
 } from '../service/baseGeneratorService';
 import { isValidNumberOrExecute } from '../../core/service/validationService';
 
 import { promptInputQuestion, promptListQuestion } from '../../core/service/promptQuestionsService';
-import { readFile, writeFile } from '../../core/utils/utils'
+import { readFile, writeFile } from '../../core/utils/utils';
 import { getGeneratorsDirNameList } from '../../core/service/generatorService';
 
 const createBaseDirectoryEstructure = ({ baseDirName }) =>
@@ -42,17 +42,17 @@ const createFilesInBaseDirectory = (answers) =>
         .then(generateFile(answers, 'Service File completed'))
         .then(() => createTemplate(answers, answers.filesToGenerate))
         .then(() => getUseCaseDefinitions(answers))
-        .then(generateFile(answers, 'UseCase File completed'))
+        .then(generateFile(answers, 'UseCase File completed'));
 
 const createTemplate = (answers, filesToGenerate) =>
     filesToGenerate.length
         ? startPromise()
-            .then(() => filesToGenerate[0])
-            .then((selectedFile) => ({ ...answers, ...selectedFile }))
-            .then(getTemplateDefinitions)
-            .then(generateFile(answers, `${filesToGenerate[0].filePascalName} Template completed`))
-            .then(() => createTemplate(answers, deleteFirstOfList(filesToGenerate)))
-            .catch(logError(`error in ${filesToGenerate[0].filePascalName} createTemplate`))
+              .then(() => filesToGenerate[0])
+              .then((selectedFile) => ({ ...answers, ...selectedFile }))
+              .then(getTemplateDefinitions)
+              .then(generateFile(answers, `${filesToGenerate[0].filePascalName} Template completed`))
+              .then(() => createTemplate(answers, deleteFirstOfList(filesToGenerate)))
+              .catch(logError(`error in ${filesToGenerate[0].filePascalName} createTemplate`))
         : Promise.resolve();
 
 const numberAndNameOfFilesToCreateQuestion = () =>
@@ -74,13 +74,26 @@ const numberOfFilesToCreateQuestion = () =>
         .then(({ number }) => isValidNumberOrExecute(number, numberOfFilesToCreateQuestion));
 
 const updateGeneratorDefinitions = (preparedData) =>
+    preparedData.hide
+        ? Promise.resolve()
+        : startPromise()
+              .then(() => getDefinitions())
+              .then(generateFile(preparedData, 'Update Generator Definitions completed'));
+
+const selectOneGeneratorFolders = () =>
     startPromise()
-        .then(() => getDefinitions())
-        .then(generateFile(preparedData, 'Update Generator Definitions completed'))
+        .then(() => getGeneratorsDirNameList())
+        .then((generatorDirList) =>
+            promptListQuestion(
+                'baseDirName',
+                'Select directory where the generators will be located',
+            )(generatorDirList),
+        );
 
-const selectOneGeneratorFolders = () => startPromise()
-    .then(() => getGeneratorsDirNameList())
-    .then(generatorDirList => promptListQuestion('baseDirName', 'Select directory where the generators will be located')(generatorDirList))
-
-
-export { createBaseDirectoryEstructure, createFilesInBaseDirectory, numberAndNameOfFilesToCreateQuestion, updateGeneratorDefinitions, selectOneGeneratorFolders };
+export {
+    createBaseDirectoryEstructure,
+    createFilesInBaseDirectory,
+    numberAndNameOfFilesToCreateQuestion,
+    updateGeneratorDefinitions,
+    selectOneGeneratorFolders,
+};
