@@ -16,12 +16,14 @@ import {
     getGeneratorsDefinitions,
     fillListWithQuestion,
     addExportDefault,
-    addImportStatement
+    addImportStatement,
+    getDefinitions
 } from '../service/baseGeneratorService';
 import { isValidNumberOrExecute } from '../../core/service/validationService';
 
-import { promptInputQuestion } from '../../core/service/promptQuestionsService';
+import { promptInputQuestion, promptListQuestion } from '../../core/service/promptQuestionsService';
 import { readFile, writeFile } from '../../core/utils/utils'
+import { getGeneratorsDirNameList } from '../../core/service/generatorService';
 
 const createBaseDirectoryEstructure = ({ baseDirName }) =>
     startPromise(baseDirName)
@@ -41,7 +43,6 @@ const createFilesInBaseDirectory = (answers) =>
         .then(() => createTemplate(answers, answers.filesToGenerate))
         .then(() => getUseCaseDefinitions(answers))
         .then(generateFile(answers, 'UseCase File completed'))
-        .then(() => updateGeneratorDefinitions(answers));
 
 const createTemplate = (answers, filesToGenerate) =>
     filesToGenerate.length
@@ -74,12 +75,12 @@ const numberOfFilesToCreateQuestion = () =>
 
 const updateGeneratorDefinitions = (preparedData) =>
     startPromise()
-        .then(() => readFile('./src/generatorDefinitions.js'))
-        .then((fileData) => fileData.toString().split("\n"))
-        .then((fileLinesList) => addImportStatement(fileLinesList, preparedData))
-        .then((fileLinesList) => addExportDefault(fileLinesList, preparedData))
-        .then((fileLinesList) => fileLinesList.join('\n'))
-        .then((fileDataUpdated) => writeFile('./src/generatorDefinitions.js', fileDataUpdated))
+        .then(() => getDefinitions())
+        .then(generateFile(preparedData, 'Update Generator Definitions completed'))
+
+const selectOneGeneratorFolders = () => startPromise()
+    .then(() => getGeneratorsDirNameList())
+    .then(generatorDirList => promptListQuestion('baseDirName', 'Select directory where the generators will be located')(generatorDirList))
 
 
-export { createBaseDirectoryEstructure, createFilesInBaseDirectory, numberAndNameOfFilesToCreateQuestion, updateGeneratorDefinitions };
+export { createBaseDirectoryEstructure, createFilesInBaseDirectory, numberAndNameOfFilesToCreateQuestion, updateGeneratorDefinitions, selectOneGeneratorFolders };

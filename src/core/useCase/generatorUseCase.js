@@ -1,6 +1,8 @@
 import { getTemplate, renderTemplate, writeTemplate } from '..//service/templateService.js';
-import { executeEveryAndGetResult, startPromise, logPromise, logError } from '../utils/utils.js';
+import { executeEveryAndGetResult, executeEveryWithDataAndPreviousResults, executeEvery, startPromise, logPromise, logError } from '../utils/utils.js';
 import { logGreen, logRed } from '../service/logService.js';
+import { promptListQuestion } from '../service/promptQuestionsService.js';
+import { getGeneratorsListNames, getGeneratorData, getGeneratorToExecute } from '../service/generatorService'
 
 const generateFile =
     (data, log) =>
@@ -26,13 +28,13 @@ const startGenerator = (questionsToMakeWrapper, transformDataWrapper, createWrap
 const questionsToMake =
     (...listOfQuestions) =>
         () =>
-            Promise.resolve().then(() => executeEveryAndGetResult(undefined, listOfQuestions));
+            Promise.resolve().then(() => executeEveryAndGetResult(listOfQuestions));
 
 const transformData =
     (...listMethodsToTransform) =>
         (data) =>
             Promise.resolve()
-                .then(() => executeEveryAndGetResult(data, listMethodsToTransform))
+                .then(() => executeEveryWithDataAndPreviousResults(data, listMethodsToTransform))
                 .then((answers) => {
                     console.log(answers);
                     return answers;
@@ -41,6 +43,15 @@ const transformData =
 const create =
     (...fileDefinitions) =>
         (preparedData) =>
-            Promise.resolve().then(() => executeEveryAndGetResult(preparedData, fileDefinitions));
+            Promise.resolve().then(() => executeEvery(preparedData, fileDefinitions));
 
-export { generateFile, startGenerator, questionsToMake, transformData, create };
+const getListOfGeneratorsAndExecuteSelected = () =>
+    startPromise()
+        .then(() => getGeneratorsListNames())
+        .then((listOfGenerators) => promptListQuestion('name', 'select a generator :P')(listOfGenerators))
+        .then((selectedGenerator) => getGeneratorData(selectedGenerator.name))
+        .then((defToExecute) => getGeneratorToExecute(defToExecute))
+        .then((execute) => execute.default())
+        .then(() => console.log('You\'re welcome!'))
+
+export { generateFile, startGenerator, questionsToMake, transformData, create, getListOfGeneratorsAndExecuteSelected };

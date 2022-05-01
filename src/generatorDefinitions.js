@@ -1,7 +1,11 @@
-import nestServer from "./generatorNestServer/generators/nestServer";
-import baseGeneratorEstructure from "./coreGenerator/generators/baseGeneratorEstructure";
-
-export default {
-    nestServer,
-    baseGeneratorEstructure
-}
+const generators = [
+    {
+        baseDirName: 'generatorNestServer',
+        generators: ['nestServer'],
+    },
+    {
+        baseDirName: 'coreGenerator',
+        generators: ['baseGeneratorEstructure', 'addGeneratorInEstructure'],
+    },
+];
+export default generators;

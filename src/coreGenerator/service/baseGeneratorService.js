@@ -1,11 +1,12 @@
 import { pascalCase, camelCase } from 'change-case';
 import { prepareDefaultNameData } from '../../core/service/prepareDataService';
 import { logRed } from '../../core/service/logService';
+import generatorDefinitions from "../../generatorDefinitions"
 
-const prepareGeneralNameData = ({ baseName }) => {
+const prepareGeneralNameData = ({ baseName, baseDirName }) => {
     return {
         ...prepareDefaultNameData({ baseName }),
-        baseDirName: `generator${pascalCase(baseName)}`,
+        baseDirName: `generator${pascalCase(baseDirName)}`,
     };
 };
 
@@ -37,6 +38,39 @@ const getUseCaseDefinitions = ({ baseDirName, camelName }) => {
     };
 };
 
+const getDefinitions = () => {
+    return {
+        templateNameDir: 'coreGenerator/templates/generatorDefinitionTemplate.mustache',
+        dirToWrite: `./src/generatorDefinitions.js`,
+    };
+}
+
+const prepareGeneratorDefinitions = (answers) => {
+    const generatorsDefinition = generatorDefinitions.map(def => {
+        const generators = def.generators.map(d => ({ generatorName: d }))
+        const defParsed = {
+            baseDirName: def.baseDirName,
+            generators
+        }
+        return defParsed
+    })
+    return { generatorsDefinition: [...generatorsDefinition, { baseDirName: answers.baseDirName, generators: [{ generatorName: answers.camelName }] }] }
+}
+
+const prepareGeneratorDefinitionsToAdd = (preparedData) => {
+    const generatorsDefinition = generatorDefinitions.map(def => {
+        const generators = def.generators.map(d => ({ generatorName: d }));
+        const generatorsNameToAdd = preparedData.baseDirName === def.baseDirName ? [...generators, { generatorName: preparedData.camelName }] : generators
+
+        const defParsed = {
+            baseDirName: def.baseDirName,
+            generators: generatorsNameToAdd
+        }
+        return defParsed
+    })
+    return { generatorsDefinition: [...generatorsDefinition] }
+}
+
 const preparefilesNamesData = ({ filesNames = [] }) => {
     return {
         filesToGenerate: filesNames.map((fileName) => ({
@@ -60,7 +94,7 @@ const addExportDefault = (fileLinesList, preparedData) => {
     ]
 }
 const addImportStatement = (fileLinesList, preparedData) => {
-    const importStatement = `import ${preparedData.camelName} from "./generator${preparedData.pascalName}/generators/${preparedData.camelName}";\r`
+    const importStatement = `import ${preparedData.camelName} from "./${preparedData.baseDirName}/generators/${preparedData.camelName}";\r`
     return [
         importStatement, ...fileLinesList
     ]
@@ -76,5 +110,8 @@ export {
     prepareGeneralNameData,
     preparefilesNamesData,
     addExportDefault,
-    addImportStatement
+    addImportStatement,
+    getDefinitions,
+    prepareGeneratorDefinitions,
+    prepareGeneratorDefinitionsToAdd
 };

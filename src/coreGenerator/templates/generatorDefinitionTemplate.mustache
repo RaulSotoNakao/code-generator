@@ -1,0 +1,13 @@
+const generators = [
+{{#generatorsDefinition}}
+    {
+        baseDirName: '{{baseDirName}}',
+        generators: [
+        {{#generators}}
+            '{{generatorName}}',
+        {{/generators}}
+        ]
+    },
+{{/generatorsDefinition}}
+]
+export default generators

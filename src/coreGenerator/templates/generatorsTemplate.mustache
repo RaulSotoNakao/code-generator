@@ -7,14 +7,15 @@ import {
     {{/filesToGenerate}}
 } from '../useCase/{{camelName}}UseCase';
 
-startGenerator(
-    questionsToMake(
-        () => promptInputQuestion('baseName', 'write base_name data to use in templates :)')(),
-    ),
-    transformData((answers) => prepareDefaultNameData(answers)),
-    create(
-        {{#filesToGenerate}}
-        (preparedData) => create{{filePascalName}}(preparedData),
-        {{/filesToGenerate}}
-    ),
-);
+export default
+    startGenerator(
+        questionsToMake(
+            () => promptInputQuestion('baseName', 'write base_name data to use in templates :)')(),
+        ),
+        transformData((answers) => prepareDefaultNameData(answers)),
+        create(
+            {{#filesToGenerate}}
+            (preparedData) => create{{filePascalName}}(preparedData),
+            {{/filesToGenerate}}
+        ),
+    );
