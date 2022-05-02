@@ -1,16 +1,28 @@
 import { getTemplate, renderTemplate, writeTemplate } from '..//service/templateService.js';
-import { executeEveryAndGetResult, executeEveryWithDataAndPreviousResults, executeEvery, startPromise, logPromise, logError } from '../utils/utils.js';
+import {
+    executeEveryAndGetResult,
+    executeEveryWithDataAndPreviousResults,
+    executeEvery,
+    startPromise,
+    logPromise,
+    logError,
+} from '../utils/utils.js';
 import { logGreen, logRed } from '../service/logService.js';
 import { promptListQuestion } from '../service/promptQuestionsService.js';
-import { getGeneratorsListNames, getGeneratorData, getGeneratorToExecute } from '../service/generatorService'
+import { getGeneratorsListNames, getGeneratorData, getGeneratorToExecute } from '../service/generatorService';
 
 const generateFile =
     (data, log) =>
-        ({ templateNameDir, dirToWrite }) =>
-            getTemplate(templateNameDir)
-                .then((template) => renderTemplate(template, data))
-                .then((renderedTemplate) => writeTemplate(dirToWrite, renderedTemplate))
-                .then(logPromise(`${log}`));
+    ({ templateNameDir, dirToWrite }) =>
+        getTemplate(templateNameDir)
+            .then((template) => renderTemplate(template, data))
+            .then((renderedTemplate) => writeTemplate(dirToWrite, renderedTemplate))
+            .then(logPromise(`${log}`));
+
+const generateFileUsing = (definitionsToGet, data, log = `${definitionsToGet.name} completed`) =>
+    startPromise()
+        .then(() => definitionsToGet(data))
+        .then((definitions) => generateFile(data, log)(definitions));
 
 const startGenerator = (questionsToMakeWrapper, transformDataWrapper, createWrapper) => () => {
     return startPromise()
@@ -19,7 +31,7 @@ const startGenerator = (questionsToMakeWrapper, transformDataWrapper, createWrap
         .then(createWrapper)
         .then((finishData = {}) => {
             logGreen(`finish`);
-            Object.values(finishData).length && console.log(finishData)
+            Object.values(finishData).length && console.log(finishData);
             return {};
         })
         .catch(logError('error in Generator'));
@@ -27,23 +39,23 @@ const startGenerator = (questionsToMakeWrapper, transformDataWrapper, createWrap
 
 const questionsToMake =
     (...listOfQuestions) =>
-        () =>
-            Promise.resolve().then(() => executeEveryAndGetResult(listOfQuestions));
+    () =>
+        Promise.resolve().then(() => executeEveryAndGetResult(listOfQuestions));
 
 const transformData =
     (...listMethodsToTransform) =>
-        (data) =>
-            Promise.resolve()
-                .then(() => executeEveryWithDataAndPreviousResults(data, listMethodsToTransform))
-                .then((answers) => {
-                    console.log(answers);
-                    return answers;
-                });
+    (data) =>
+        Promise.resolve()
+            .then(() => executeEveryWithDataAndPreviousResults(data, listMethodsToTransform))
+            .then((answers) => {
+                console.log(answers);
+                return answers;
+            });
 
 const create =
     (...fileDefinitions) =>
-        (preparedData) =>
-            Promise.resolve().then(() => executeEvery(preparedData, fileDefinitions));
+    (preparedData) =>
+        Promise.resolve().then(() => executeEvery(preparedData, fileDefinitions));
 
 const getListOfGeneratorsAndExecuteSelected = () =>
     startPromise()
@@ -52,6 +64,14 @@ const getListOfGeneratorsAndExecuteSelected = () =>
         .then((selectedGenerator) => getGeneratorData(selectedGenerator.name))
         .then((defToExecute) => getGeneratorToExecute(defToExecute))
         .then((execute) => execute.default())
-        .then(() => console.log('You\'re welcome!'))
+        .then(() => console.log("You're welcome!"));
 
-export { generateFile, startGenerator, questionsToMake, transformData, create, getListOfGeneratorsAndExecuteSelected };
+export {
+    generateFile,
+    generateFileUsing,
+    startGenerator,
+    questionsToMake,
+    transformData,
+    create,
+    getListOfGeneratorsAndExecuteSelected,
+};

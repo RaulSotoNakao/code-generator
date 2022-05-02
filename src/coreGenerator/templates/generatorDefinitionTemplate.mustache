@@ -2,11 +2,7 @@ const generators = [
 {{#generatorsDefinition}}
     {
         baseDirName: '{{baseDirName}}',
-        generators: [
-        {{#generators}}
-            '{{generatorName}}',
-        {{/generators}}
-        ]
+        generators: [{{#generators}}'{{generatorName}}',{{/generators}}]
     },
 {{/generatorsDefinition}}
 ]

@@ -8,7 +8,7 @@ import {
     deleteFirstOfList,
 } from '../../core/utils/utils';
 import { createDirInSrc } from '../../core/service/fileSystemService';
-import { generateFile } from '../../core/useCase/generatorUseCase';
+import { generateFile, generateFileUsing } from '../../core/useCase/generatorUseCase';
 import {
     getTemplateDefinitions,
     getUseCaseDefinitions,
@@ -36,13 +36,10 @@ const createBaseDirectoryEstructure = ({ baseDirName }) =>
 
 const createFilesInBaseDirectory = (answers) =>
     startPromise()
-        .then(() => getGeneratorsDefinitions(answers))
-        .then(generateFile(answers, 'generator File completed'))
-        .then(() => getServiceDefinitions(answers))
-        .then(generateFile(answers, 'Service File completed'))
-        .then(() => createTemplate(answers, answers.filesToGenerate))
-        .then(() => getUseCaseDefinitions(answers))
-        .then(generateFile(answers, 'UseCase File completed'));
+        .then(() => generateFileUsing(getGeneratorsDefinitions, answers, 'generator file completed'))
+        .then(() => generateFileUsing(getServiceDefinitions, answers, 'service file completed'))
+        .then(() => generateFileUsing(getUseCaseDefinitions, answers, 'useCase file completed'))
+        .then(() => createTemplate(answers, answers.filesToGenerate));
 
 const createTemplate = (answers, filesToGenerate) =>
     filesToGenerate.length

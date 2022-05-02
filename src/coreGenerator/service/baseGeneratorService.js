@@ -24,10 +24,10 @@ const getServiceDefinitions = ({ baseDirName, camelName }) => {
     };
 };
 
-const getTemplateDefinitions = ({ baseDirName, fileCamelName }) => {
+const getTemplateDefinitions = ({ baseDirName, camelName, filePascalName }) => {
     return {
         templateNameDir: 'coreGenerator/templates/templatesTemplate.mustache',
-        dirToWrite: `./src/${baseDirName}/templates/${fileCamelName}Template.mustache`,
+        dirToWrite: `./src/${baseDirName}/templates/${camelName}${filePascalName}Template.mustache`,
     };
 };
 
