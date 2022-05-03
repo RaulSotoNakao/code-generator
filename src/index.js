@@ -1,3 +1,3 @@
-import { getListOfGeneratorsAndExecuteSelected } from './core/useCase/generatorUseCase';
+import { generatorMenu } from './core/useCase/generatorUseCase';
 
-getListOfGeneratorsAndExecuteSelected();
+generatorMenu();

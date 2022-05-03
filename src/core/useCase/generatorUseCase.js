@@ -9,7 +9,13 @@ import {
 } from '../utils/utils.js';
 import { logGreen, logRed } from '../service/logService.js';
 import { promptListQuestion } from '../service/promptQuestionsService.js';
-import { getGeneratorsListNames, getGeneratorData, getGeneratorToExecute } from '../service/generatorService';
+import {
+    getGeneratorsListNames,
+    getGeneratorData,
+    getGeneratorToExecute,
+    getGeneratorsDirNameList,
+    getGeneratorsListNamesInDirectory,
+} from '../service/generatorService';
 
 const generateFile =
     (data, log) =>
@@ -66,6 +72,23 @@ const getListOfGeneratorsAndExecuteSelected = () =>
         .then((execute) => execute.default())
         .then(() => console.log("You're welcome!"));
 
+const generatorMenu = () => {
+    startPromise()
+        .then(() => getGeneratorsDirNameList())
+        .then((listOfGemeratorsDir) =>
+            promptListQuestion(
+                'selectedDir',
+                'select the directory where the generator you need to use is located  :P',
+            )(listOfGemeratorsDir),
+        )
+        .then(({ selectedDir }) => getGeneratorsListNamesInDirectory(selectedDir))
+        .then((listOfGenerators) => promptListQuestion('name', 'select a generator :P')(listOfGenerators))
+        .then((selectedGenerator) => getGeneratorData(selectedGenerator.name))
+        .then((defToExecute) => getGeneratorToExecute(defToExecute))
+        .then((execute) => execute.default())
+        .then(() => console.log("You're welcome!"));
+};
+
 export {
     generateFile,
     generateFileUsing,
@@ -74,4 +97,5 @@ export {
     transformData,
     create,
     getListOfGeneratorsAndExecuteSelected,
+    generatorMenu,
 };

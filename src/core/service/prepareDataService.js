@@ -27,6 +27,7 @@ const prepareDefaultNameData = ({ baseName = 'TABLE_NAME_NOT_DEFINED' }) => {
     return {
         pascalName: pascalCase(baseName),
         camelName: camelCase(baseName),
+        titleName: capitalCase(baseName)
     };
 };
 
