@@ -72,6 +72,12 @@ const getListOfGeneratorsAndExecuteSelected = () =>
         .then((execute) => execute.default())
         .then(() => console.log("You're welcome!"));
 
+const selectGeneratorDataQuestion = () =>
+    startPromise()
+        .then(() => getGeneratorsListNames())
+        .then((listOfGenerators) => promptListQuestion('name', 'select a generator :P')(listOfGenerators))
+        .then((selectedGenerator) => getGeneratorData(selectedGenerator.name));
+
 const generatorMenu = () => {
     startPromise()
         .then(() => getGeneratorsDirNameList())
@@ -82,7 +88,7 @@ const generatorMenu = () => {
             )(listOfGemeratorsDir),
         )
         .then(({ selectedDir }) => getGeneratorsListNamesInDirectory(selectedDir))
-        .then((listOfGenerators) => promptListQuestion('name', 'select a generator :P')(listOfGenerators))
+        .then((listOfGenerators) => promptListQuestion('name', 'select a generator to execute :P')(listOfGenerators))
         .then((selectedGenerator) => getGeneratorData(selectedGenerator.name))
         .then((defToExecute) => getGeneratorToExecute(defToExecute))
         .then((execute) => execute.default())
@@ -98,4 +104,5 @@ export {
     create,
     getListOfGeneratorsAndExecuteSelected,
     generatorMenu,
+    selectGeneratorDataQuestion
 };

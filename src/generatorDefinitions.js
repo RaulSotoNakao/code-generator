@@ -5,7 +5,7 @@ const generators = [
     },
     {
         baseDirName: 'coreGenerator',
-        generators: ['baseGeneratorEstructure', 'addGeneratorInEstructure'],
+        generators: ['baseGeneratorEstructure', 'addGeneratorInEstructure', 'addFileToGenerateInGenerator'],
     },
 ];
 export default generators;

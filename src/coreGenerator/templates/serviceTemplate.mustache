@@ -1,9 +1,9 @@
 
 {{#filesToGenerate}}
-const getDirectory{{filePascalName}}Definitions = ({ camelName = 'CAMEL_NAME_NOT_DEFINED' }) => {
+const {{fileCamelName}}Definitions = ({ camelName = 'CAMEL_NAME_NOT_DEFINED' }) => {
     return {
         templateNameDir: '{{baseDirName}}/templates/{{camelName}}{{filePascalName}}Template.mustache',
-        dirToWrite: `./generatedFiles/${camelName}{{filePascalName}}.js`,
+        dirToWrite: `./generatedFiles/${camelName}/${camelName}{{filePascalName}}.js`,
     };
 };
 
@@ -12,6 +12,6 @@ const getDirectory{{filePascalName}}Definitions = ({ camelName = 'CAMEL_NAME_NOT
 
 export {
     {{#filesToGenerate}}
-    getDirectory{{filePascalName}}Definitions, 
+    {{fileCamelName}}Definitions, 
     {{/filesToGenerate}}
 };

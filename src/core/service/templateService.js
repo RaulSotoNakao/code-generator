@@ -1,5 +1,5 @@
 import Mustache from 'mustache';
-import { readFile, writeFile } from '../utils/utils';
+import { readFile, writeFile } from '../service/fileSystemService';
 
 const getTemplate = (templateNameDir, type = 'utf8') => {
     return readFile(`./src/${templateNameDir}`, type);

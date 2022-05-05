@@ -22,12 +22,10 @@ import {
 import { isValidNumberOrExecute } from '../../core/service/validationService';
 
 import { promptInputQuestion, promptListQuestion } from '../../core/service/promptQuestionsService';
-import { readFile, writeFile } from '../../core/utils/utils';
 import { getGeneratorsDirNameList } from '../../core/service/generatorService';
 
 const createBaseDirectoryEstructure = ({ baseDirName }) =>
     startPromise(baseDirName)
-        .then(() => logPromise('baseDirName'))
         .then(() => createDirInSrc(baseDirName))
         .then(() => createDirInSrc(`${baseDirName}/generators`))
         .then(() => createDirInSrc(`${baseDirName}/service`))
@@ -93,4 +91,5 @@ export {
     numberAndNameOfFilesToCreateQuestion,
     updateGeneratorDefinitions,
     selectOneGeneratorFolders,
+    createTemplate,
 };

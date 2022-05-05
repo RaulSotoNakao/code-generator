@@ -1,11 +1,18 @@
-import { startGenerator, questionsToMake, transformData, create } from '../../core/useCase/generatorUseCase';
+import {
+    startGenerator,
+    questionsToMake,
+    transformData,
+    create,
+    generateFileUsing,
+} from '../../core/useCase/generatorUseCase';
 import { promptInputQuestion } from '../../core/service/promptQuestionsService';
 import { prepareDefaultNameData } from '../../core/service/prepareDataService';
 import {
     {{#filesToGenerate}}
-    create{{filePascalName}},
+    {{fileCamelName}}Definitions,
     {{/filesToGenerate}}
-} from '../useCase/{{camelName}}UseCase';
+} from '../service/{{camelName}}Service';
+import { createDirectories } from '../useCase/{{camelName}}UseCase';
 
 export default
     startGenerator(
@@ -14,8 +21,9 @@ export default
         ),
         transformData((answers) => prepareDefaultNameData(answers)),
         create(
+            (preparedData) => createDirectories(preparedData),
             {{#filesToGenerate}}
-            (preparedData) => create{{filePascalName}}(preparedData),
+            (preparedData) => generateFileUsing({{fileCamelName}}Definitions, preparedData, '{{filePascalName}} completed'),
             {{/filesToGenerate}}
         ),
     );

@@ -1,22 +1,7 @@
-import { logPromise, logError, startPromise } from '../../core/utils/utils.js';
-import { generateFile } from '../../core/useCase/generatorUseCase';
-import {
-    {{#filesToGenerate}}
-    getDirectory{{filePascalName}}Definitions, 
-    {{/filesToGenerate}}
-} from '../service/{{camelName}}Service';
+import { createDirInRoot } from '../../core/service/fileSystemService';
+import { startPromise } from '../../core/utils/utils';
 
-{{#filesToGenerate}}
-const create{{filePascalName}} = (data) =>
-    startPromise(data)
-        .then(getDirectory{{filePascalName}}Definitions)
-        .then(generateFile(data, '{{filePascalName}} completed'))
-        .catch(logError('error in {{filePascalName}}'));
+const createDirectories = (preparedData) =>
+    startPromise().then(() => createDirInRoot(`generatedFiles/${preparedData.camelName}`));
 
-{{/filesToGenerate}}
-
-export {
-    {{#filesToGenerate}}
-    create{{filePascalName}}, 
-    {{/filesToGenerate}}
-};
+export { createDirectories };
