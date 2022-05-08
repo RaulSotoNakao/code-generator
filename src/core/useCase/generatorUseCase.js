@@ -16,6 +16,7 @@ import {
     getGeneratorsDirNameList,
     getGeneratorsListNamesInDirectory,
 } from '../service/generatorService';
+import { readFile, writeFile } from '../service/fileSystemService.js';
 
 const generateFile =
     (data, log) =>
@@ -95,6 +96,25 @@ const generatorMenu = () => {
         .then(() => console.log("You're welcome!"));
 };
 
+const updateFileWith = (fileDir, dataUsed, ...funcToMoDifyFile) =>
+    startPromise()
+        .then(() => readFile(fileDir))
+        .then((fileData) => fileData.toString())
+        .then((fileData) =>
+            funcToMoDifyFile.reduce(
+                (currentFileDataPromise, previousFunc) =>
+                    currentFileDataPromise.then((currentFileData) =>
+                        Promise.resolve(previousFunc(currentFileData, dataUsed)),
+                    ),
+                Promise.resolve(fileData),
+            ),
+        )
+        .then((fileDataUpdated) => writeFile(fileDir, fileDataUpdated))
+        .catch((err) => {
+            console.log('Error updating file');
+            console.log(err);
+        });
+
 export {
     generateFile,
     generateFileUsing,
@@ -104,5 +124,6 @@ export {
     create,
     getListOfGeneratorsAndExecuteSelected,
     generatorMenu,
-    selectGeneratorDataQuestion
+    selectGeneratorDataQuestion,
+    updateFileWith,
 };

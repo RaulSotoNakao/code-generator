@@ -3,6 +3,13 @@ import { generateFile } from '../../core/useCase/generatorUseCase';
 import { getFilesNamesOfDirectory, readFile, writeFile } from '../../core/service/fileSystemService.js';
 import { promptListQuestion } from '../../core/service/promptQuestionsService';
 import { addDataAfterOf, addDataBeforeOf } from '../../core/useCase/fileSystemUseCase.js';
+import {
+    templateFileGenerator,
+    templateImportFileDefinitions,
+    templateServiceDefinitions,
+} from '../service/addFileToGenerateInGeneratorService.js';
+import { updateFileWith } from '../../core/useCase/generatorUseCase';
+
 const selectServiceOfGeneratorQuestion = (answers) =>
     startPromise()
         .then(() => getFilesNamesOfDirectory(`./src/${answers.baseDirName}/service`))
@@ -14,60 +21,36 @@ const selectUseCaseOfGeneratorQuestion = (answers) =>
         .then(promptListQuestion('selectedUseCase', 'select useCase to add files'));
 
 const updateGeneratorWithNewFiles = (preparedData) =>
-    startPromise()
-        .then(() => readFile(`./src/${preparedData.baseDirName}/generators/${preparedData.selectedGenerator}.js`))
-        .then((fileData) => fileData.toString())
-        .then((fileData) => {
-            const dataToAdd = preparedData.filesToGenerate.map((file) => `${file.fileCamelName}Definitions,\r\n`).join('');
-            const key = `} from '../service/${preparedData.selectedService}'`;
+    updateFileWith(
+        `./src/${preparedData.baseDirName}/generators/${preparedData.selectedGenerator}.js`,
+        preparedData,
+        (fileData, dataUsed) => {
+            const dataToAdd = dataUsed.filesToGenerate.map(templateImportFileDefinitions).join('');
+            const key = `(, \w* )*\} from '../service/${dataUsed.selectedService}'`;
             return addDataBeforeOf(fileData, dataToAdd, key);
-        })
-        .then((fileData) => {
-            const dataToAdd = preparedData.filesToGenerate
-                .map(
-                    (file) =>
-                        `(preparedData) => generateFileUsing(${file.fileCamelName}Definitions, preparedData, '${file.filePascalName} completed'),\n`,
-                )
-                .join('');
+        },
+        (fileData, dataUsed) => {
+            const dataToAdd = dataUsed.filesToGenerate.map(templateFileGenerator).join('');
             const key = /create\([^]*\(preparedData\).*\=\>.*\r\n/;
             return addDataAfterOf(fileData, key, dataToAdd);
-        })
-        .then((fileDataUpdated) =>
-            writeFile(
-                `./src/${preparedData.baseDirName}/generators/${preparedData.selectedGenerator}.js`,
-                fileDataUpdated,
-            ),
-        );
+        },
+    );
 
 const updateServiceWithNewFiles = (preparedData) =>
-    startPromise()
-        .then(() => readFile(`./src/${preparedData.baseDirName}/service/${preparedData.selectedService}.js`))
-        .then((fileData) => fileData.toString())
-        .then((fileData) => {
-            const dataToAdd = preparedData.filesToGenerate
-                .map(
-                    (file) =>
-                        `const ${file.fileCamelName}Definitions = ({ camelName = 'CAMEL_NAME_NOT_DEFINED' }) => {
-    return {
-        templateNameDir: '${preparedData.baseDirName}/templates/${preparedData.camelName}${file.filePascalName}Template.mustache',
-        dirToWrite: \`./generatedFiles/\${camelName}/\${camelName}${file.filePascalName}.js\`,
-    };
-};\r\n\r\n`,
-                )
-                .join('');
+    updateFileWith(
+        `./src/${preparedData.baseDirName}/service/${preparedData.selectedService}.js`,
+        preparedData,
+        (fileData, dataUsed) => {
+            const dataToAdd = dataUsed.filesToGenerate.map(templateServiceDefinitions(dataUsed)).join('');
             const key = /export.*\{/;
             return addDataBeforeOf(fileData, dataToAdd, key);
-        })
-        .then((fileData) => {
-            const dataToAdd = preparedData.filesToGenerate
-                .map((file) => `${file.fileCamelName}Definitions,\n`)
-                .join('');
+        },
+        (fileData, dataUsed) => {
+            const dataToAdd = dataUsed.filesToGenerate.map((file) => `${file.fileCamelName}Definitions,\n`).join('');
             const key = /export.*\{/;
             return addDataAfterOf(fileData, key, dataToAdd);
-        })
-        .then((fileDataUpdated) =>
-            writeFile(`./src/${preparedData.baseDirName}/service/${preparedData.selectedService}.js`, fileDataUpdated),
-        );
+        },
+    );
 
 export {
     updateGeneratorWithNewFiles,
