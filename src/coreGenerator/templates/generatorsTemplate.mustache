@@ -12,7 +12,7 @@ import {
     {{fileCamelName}}Definitions,
     {{/filesToGenerate}}
 } from '../service/{{camelName}}Service';
-import { createDirectories } from '../useCase/{{camelName}}UseCase';
+import { createDirInRoot } from '../../core/service/fileSystemService';
 
 export default
     startGenerator(
@@ -21,7 +21,7 @@ export default
         ),
         transformData((answers) => prepareDefaultNameData(answers)),
         create(
-            (preparedData) => createDirectories(preparedData),
+            (preparedData) => createDirInRoot(`generatedFiles/${preparedData.camelName}`),
             {{#filesToGenerate}}
             (preparedData) => generateFileUsing({{fileCamelName}}Definitions, preparedData, '{{filePascalName}} completed'),
             {{/filesToGenerate}}
