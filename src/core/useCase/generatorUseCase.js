@@ -31,38 +31,47 @@ const generateFileUsing = (definitionsToGet, data, log = `${definitionsToGet.nam
         .then(() => definitionsToGet(data))
         .then((definitions) => generateFile(data, log)(definitions));
 
-const startGenerator = (questionsToMakeWrapper, transformDataWrapper, createWrapper) => () => {
-    return startPromise()
-        .then(questionsToMakeWrapper)
-        .then(transformDataWrapper)
-        .then(createWrapper)
-        .then((finishData = {}) => {
-            logGreen(`finish`);
-            Object.values(finishData).length && console.log(finishData);
-            return {};
-        })
-        .catch(logError('error in Generator'));
-};
+const startGenerator =
+    (...functionsToExecute) =>
+    () => {
+        const getFunction = getFunctionOfList(functionsToExecute);
+        const questionsToMakeFunction = getFunction('questionsToMake');
+        const transformDataFunction = getFunction('transformData');
+        const createFunction = getFunction('create');
+        return startPromise()
+            .then(questionsToMakeFunction)
+            .then(transformDataFunction)
+            .then(createFunction)
+            .then(() => {
+                logGreen(`finish`);
+                return {};
+            })
+            .catch(logError('error in Generator'));
+    };
 
-const questionsToMake =
-    (...listOfQuestions) =>
-    () =>
-        Promise.resolve().then(() => executeEveryAndGetResult(listOfQuestions));
+const getFunctionOfList = (list) => (name) => list.find((f) => f.name === name) || ((data) => Promise.resolve(data));
 
-const transformData =
-    (...listMethodsToTransform) =>
-    (data) =>
-        Promise.resolve()
-            .then(() => executeEveryWithDataAndPreviousResults(data, listMethodsToTransform))
-            .then((answers) => {
-                console.log(answers);
-                return answers;
-            });
+const questionsToMake = (...listOfQuestions) =>
+    function questionsToMake() {
+        return executeEveryAndGetResult(listOfQuestions);
+    };
 
-const create =
-    (...fileDefinitions) =>
-    (preparedData) =>
-        Promise.resolve().then(() => executeEvery(preparedData, fileDefinitions));
+const transformData = (...listMethodsToTransform) =>
+    function transformData(data) {
+        return executeEveryWithDataAndPreviousResults(data, listMethodsToTransform);
+    };
+
+const create = (...fileDefinitions) =>
+    function create(preparedData) {
+        return Promise.resolve(preparedData.errorCatch)
+            .then(rejectOnError)
+            .then(() => executeEvery(preparedData, fileDefinitions))
+            .catch((err) => console.log('Please solve Errors, create will no execute with errors'));
+    };
+const rejectOnError = (error) =>
+    new Promise((resolve, reject) =>
+        !error ? resolve() : reject('Please solve Errors, create will no execute with errors'),
+    );
 
 const getListOfGeneratorsAndExecuteSelected = () =>
     startPromise()

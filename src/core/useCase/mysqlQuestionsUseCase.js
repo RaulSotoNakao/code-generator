@@ -1,5 +1,5 @@
 import { startMysqlConnection, endMysqlConnection, executeMysqlQuerie } from '../service/mysqlService';
-import { startPromise, mergeData, mapBy, logAndStartPromise } from '../utils/utils';
+import { startPromise, mapBy } from '../utils/utils';
 import config from '../../config/development';
 import {
     getSchemasExcludingInternalSchemasQuery,
@@ -10,7 +10,7 @@ import {
 } from '../service/metaDataDBQuery';
 import { promptListQuestion, promptCheckQuestion } from '../service/promptQuestionsService';
 
-const selectSchemaQuestion = (answers = {}) => {
+const selectSchemaQuestion = () => {
     const conn = startMysqlConnection(config);
 
     return startPromise()
@@ -18,72 +18,49 @@ const selectSchemaQuestion = (answers = {}) => {
         .then(executeMysqlQuerie(conn))
         .then(mapBy('schemaName'))
         .then(promptListQuestion('schema', 'select schema to find tables'))
-        .then(mergeData(answers))
-        .catch((err) => {
-            console.log(err);
-        })
         .finally(() => endMysqlConnection(conn));
 };
 
-const selectTableOfSchemaQuestion = (answers = {}) => {
+const selectTableOfSchemaQuestion = (schema) => {
     const conn = startMysqlConnection(config);
-    const { schema } = answers;
 
     return startPromise(schema)
         .then(getTablesBySchemaQuery)
         .then(executeMysqlQuerie(conn))
-        .then(mapBy('TABLE_NAME'))
+        .then(mapBy('table_name'))
         .then(promptListQuestion('table', 'Select table to get data'))
-        .then(mergeData(answers))
-        .catch((err) => {
-            console.error(err);
-        })
         .finally(() => endMysqlConnection(conn));
 };
 
-const selectReferencesOfTableQuestion = (answers = {}) => {
+const selectReferencesOfTableQuestion = (schema, table) => {
     const conn = startMysqlConnection(config);
-    const { schema, table } = answers;
     return startPromise({ schema, table })
         .then(getReferencesQuery)
         .then(executeMysqlQuerie(conn))
         .then(mapBy('foreignTable'))
         .then(promptCheckQuestion('references', 'Select references to use (May not have)'))
-        .then(mergeData(answers))
-        .catch((err) => {
-            console.log(err);
-        })
         .finally(() => endMysqlConnection(conn));
 };
 
-const selectForeignKeysOfTableQuestion = (answers = {}) => {
+const selectForeignKeysOfTableQuestion = (schema, table) => {
     const conn = startMysqlConnection(config);
-    const { schema, table } = answers;
     return startPromise({ schema, table })
         .then(getForeignKeysQuery)
         .then(executeMysqlQuerie(conn))
         .then(mapBy('referencedTableName'))
         .then(promptCheckQuestion('relations', 'Select relations to use (May not have)'))
-        .then(mergeData(answers))
-        .catch((err) => {
-            console.log(err);
-        })
         .finally(() => endMysqlConnection(conn));
 };
 
-const getTableData = (answers = {}) => {
+const getTableData = (schema, table) => {
     const conn = startMysqlConnection(config);
-    const { table, schema } = answers;
     return startPromise({ table, schema })
         .then(getDataTableQuery)
         .then(executeMysqlQuerie(conn))
         .then((result) => {
             return { tableData: result.map((r) => ({ ...r })) };
         })
-        .then(mergeData(answers))
-        .catch((err) => {
-            console.error(err);
-        });
+        .finally(() => endMysqlConnection(conn));
 };
 
 export {
